@@ -1,0 +1,27 @@
+name: ServiGo CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Configure test environment
+        run: |
+          echo "SECRET_KEY=ci-secret-key" > .env
+          echo "DEBUG=True" >> .env
+          echo "ALLOWED_HOSTS=localhost,127.0.0.1,testserver" >> .env
+      - name: Django checks
+        run: python manage.py check
+      - name: Run tests
+        run: python manage.py test
